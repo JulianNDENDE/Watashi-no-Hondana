@@ -5,6 +5,7 @@ import { useTheme } from "tamagui";
 import MangaHeader from "../../components/manga/MangaHeader";
 import MangaDescription from "../../components/manga/MangaDescription";
 import GenreList from "../../components/manga/GenreList";
+import ChapterList from "../../components/manga/ChapterList";
 
 const MangaDetails = () => {
   const { manga, coverUrl } = useLocalSearchParams();
@@ -23,6 +24,7 @@ const MangaDetails = () => {
       />
       <MangaDescription description={parsedManga.description} />
       <GenreList tags={parsedManga.tags} />
+      <ChapterList mangaId={parsedManga.id} />
     </ScrollView>
   );
 };

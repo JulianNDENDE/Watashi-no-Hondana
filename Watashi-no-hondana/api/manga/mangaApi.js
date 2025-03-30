@@ -34,3 +34,32 @@ export const getCoverFilename = async (mangaId) => {
     return null;
   }
 };
+
+export const getChapters = async (mangaId) => {
+  try {
+    const response = await axios.get(
+      `${MANGADEX_BASE_URL}/manga/${mangaId}/feed?translatedLanguage[]=en&order[chapter]=desc`
+    );
+
+    return {
+      chapters: response.data.data.map((chapter) => {
+        const scanlationGroup = chapter.relationships.find(
+          (rel) => rel.type === "scanlation_group"
+        )?.attributes?.name || "Unknown Group";
+
+        return {
+          id: chapter.id,
+          number: chapter.attributes.chapter || "?",
+          title: chapter.attributes.title || `Chapter ${chapter.attributes.chapter}`,
+          publishedAt: new Date(chapter.attributes.publishAt).toLocaleDateString(),
+          pages: chapter.attributes.pages,
+          scanlationGroup,
+        };
+      }),
+      totalChapters: response.data.total,
+    };
+  } catch (error) {
+    console.error("Error fetching chapters:", error);
+    return { chapters: [], totalChapters: 0 };
+  }
+};
