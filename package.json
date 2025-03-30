@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "firebase": "^11.5.0",
+    "reactn": "^2.2.7",
+    "tamagui": "^1.125.26"
+  }
+}
