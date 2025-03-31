@@ -63,3 +63,19 @@ export const getChapters = async (mangaId) => {
     return { chapters: [], totalChapters: 0 };
   }
 };
+
+export const getChapterImages = async (chapterId) => {
+  try {
+    const response = await axios.get(`${MANGADEX_BASE_URL}/at-home/server/${chapterId}`);
+    const { baseUrl, chapter } = response.data;
+    const imageFilenames = chapter.data;
+    // Construct full URLs: baseUrl + '/data/' + chapter.hash + '/' + filename
+    const imageUrls = imageFilenames.map(
+      filename => `${baseUrl}/data/${chapter.hash}/${filename}`
+    );
+    return imageUrls;
+  } catch (error) {
+    console.error("Error fetching chapter images:", error);
+    throw new Error("Failed to fetch chapter images");
+  }
+};

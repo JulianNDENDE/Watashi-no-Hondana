@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native";
-import { getCoverFilename } from "../../api/mangas/mangaApi";
+import { getCoverFilename } from "../../api/manga/mangaApi";
 import { View, Text, Image, useTheme } from "tamagui";
 import { useRouter } from "expo-router";
 import { normalizeManga } from "../../utils/normalizeManga";

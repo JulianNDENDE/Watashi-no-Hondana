@@ -6,7 +6,7 @@ import { getChapters } from "../../api/manga/mangaApi";
 
 const ChapterList = ({ mangaId }) => {
   const [chapters, setChapters] = useState([]);
-  const [totalChapters, setTotalChapters] = useState(0); // Store total chapters
+  const [totalChapters, setTotalChapters] = useState(0);
   const theme = useTheme();
   const router = useRouter();
 
@@ -15,7 +15,7 @@ const ChapterList = ({ mangaId }) => {
       try {
         const { chapters: chapterData, totalChapters } = await getChapters(mangaId);
         setChapters(chapterData);
-        setTotalChapters(totalChapters); // Set the total chapters here
+        setTotalChapters(totalChapters);
       } catch (error) {
         console.error("Failed to fetch chapters:", error);
       }
@@ -33,7 +33,12 @@ const ChapterList = ({ mangaId }) => {
         chapters.map((chapter) => (
           <TouchableOpacity
             key={chapter.id}
-            onPress={() => router.push(`/chapter/${chapter.id}`)}
+            onPress={() =>
+              router.push({
+                pathname: `/manga/chapter/${chapter.id}`,
+                params: { chapterTitle: chapter.title, chapterNumber: chapter.number },
+              })
+            }
           >
             <View
               backgroundColor={theme.backgroundLight}
