@@ -17,6 +17,16 @@ export const getMangasBySearch = async (query) => {
   }
 };
 
+export const getMangaById = async (mangaId) => {
+  try {
+    const response = await axios.get(`${MANGADEX_BASE_URL}/manga/${mangaId}?includes[]=cover_art`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching manga by id:", error);
+    throw new Error("Failed to fetch manga by id");
+  }
+};
+
 export const getCoverFilename = async (mangaId) => {
   try {
     const response = await axios.get(`${MANGADEX_BASE_URL}/manga/${mangaId}?includes[]=cover_art`);

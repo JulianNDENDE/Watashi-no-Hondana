@@ -1,21 +1,19 @@
-import React, { useState, useEffect } from 'react'
-import { ScrollView, View as RNView, Image, ActivityIndicator, Dimensions } from 'react-native'
+import React, { useState, useEffect, useRef } from 'react'
+import { ScrollView, Image, ActivityIndicator, Dimensions, View as RNView } from 'react-native'
 import { View, useTheme } from 'tamagui'
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 
-// Import external reader components
 import { ReaderHeader } from '../../../components/reader/ReaderHeader'
 import { ReaderPageSlider } from '../../../components/reader/ReaderPageSlider'
 import { ReaderBottomBar } from '../../../components/reader/ReaderBottomBar'
 import { ReadingModeMenu } from '../../../components/reader/ReadingModeMenu'
 import { BrightnessMenu } from '../../../components/reader/BrightnessMenu'
 
-// Import the API function to get chapter images
 import { getChapterImages } from '../../../api/manga/mangaApi'
 
-// Get device width for full-immersion images
 const { width: deviceWidth } = Dimensions.get('window')
+const imageHeight = deviceWidth * 1.46
 
 const MangaReader = () => {
   const theme = useTheme()
@@ -29,7 +27,6 @@ const MangaReader = () => {
   const [readingMode, setReadingMode] = useState('Paged (left to right)')
   const [isRotationEnabled, setIsRotationEnabled] = useState(true)
   const [brightness, setBrightness] = useState(50)
-  const [currentPage, setCurrentPage] = useState(1)
 
   // Menu visibility states
   const [isReadingModeMenuVisible, setIsReadingModeMenuVisible] = useState(false)
@@ -86,11 +83,12 @@ const MangaReader = () => {
         />
       )}
 
-      {/* Manga Pages */}
+      {/* Manga Pages using FlatList */}
       <ScrollView
         onTouchEnd={toggleFullScreenMode}
+        removeClippedSubviews={true}
         contentContainerStyle={{
-          padding: 0, // remove padding to avoid gaps
+          padding: 0,
         }}
       >
         {isLoading ? (
@@ -101,24 +99,14 @@ const MangaReader = () => {
               key={index}
               source={{ uri }}
               style={{
-                width: deviceWidth, // full screen width
-                height: deviceWidth * 1.5, // adjust height as needed
+                width: deviceWidth,
+                height: deviceWidth * 1.445,
                 resizeMode: 'contain',
               }}
             />
           ))
         )}
       </ScrollView>
-
-
-      {/* Page Slider (only when no menu is open) */}
-      {!fullScreenMode && !isReadingModeMenuVisible && !isBrightnessMenuVisible && (
-        <ReaderPageSlider
-          currentPage={currentPage}
-          onChangePage={setCurrentPage}
-          maxPages={chapterImages.length > 0 ? chapterImages.length : 100}
-        />
-      )}
 
       {/* Bottom Bar (only when no menu is open) */}
       {!fullScreenMode && !isReadingModeMenuVisible && !isBrightnessMenuVisible && (

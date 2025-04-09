@@ -14,11 +14,13 @@ export const ReaderHeader = ({ onBack, chapterTitle, chapterNumber }) => {
         left: 0,
         right: 0,
         padding: 10,
-        backgroundColor: 'transparent',
-        zIndex: 600, // ensures header stays above content
+        height: 80,
+        backgroundColor:`${theme.backgroundStrong.val}90`,
+        opacity: 0.8,
+        zIndex: 600,
       }}
       flexDirection="row"
-      alignItems="center"
+      alignItems="flex-end"
     >
       <TouchableOpacity onPress={onBack}>
         <Ionicons name="arrow-back" size={24} color={theme.color.val} />

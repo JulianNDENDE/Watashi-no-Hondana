@@ -19,10 +19,8 @@ export const ReaderBottomBar = ({
       right={0}
       flexDirection="row"
       justifyContent="space-around"
-      backgroundColor={`${theme.backgroundStrong.val}90`} // semi-transparent
+      backgroundColor={`${theme.backgroundStrong.val}90`}
       padding={20}
-      borderTopWidth={1}
-      borderTopColor={theme.border.val}
     >
       {/* Reading Mode Icon */}
       <TouchableOpacity onPress={onShowReadingModeMenu}>

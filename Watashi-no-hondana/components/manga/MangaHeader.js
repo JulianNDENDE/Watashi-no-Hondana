@@ -1,8 +1,9 @@
 import React from "react";
 import { ImageBackground } from "react-native";
 import { View, Text, Image, useTheme } from "tamagui";
+import FavoriteButton from "../../components/buttons/FavoriteButton";
 
-const MangaHeader = ({ title, coverUrl, year, status, demographic, rating }) => {
+const MangaHeader = ({ title, coverUrl, year, status, demographic, rating, mangaId }) => {
   const theme = useTheme();
 
   return (
@@ -11,12 +12,18 @@ const MangaHeader = ({ title, coverUrl, year, status, demographic, rating }) => 
       style={{ width: "100%", height: 250 }}
       blurRadius={10}
     >
-      <View backgroundColor="rgba(0,0,0,0.6)" padding={15} justifyContent="center" height="100%">
+      <View
+        backgroundColor="rgba(0,0,0,0.6)"
+        padding={15}
+        justifyContent="center"
+        height="100%"
+      >
         <View flexDirection="row" alignItems="center">
           {/* Framed Manga Cover */}
           <Image 
             source={{ uri: coverUrl }} 
-            width={100} height={150} 
+            width={100}
+            height={150} 
             borderRadius={8} 
             borderColor={theme.primary} 
             borderWidth={2} 
@@ -34,6 +41,8 @@ const MangaHeader = ({ title, coverUrl, year, status, demographic, rating }) => 
             </Text>
           </View>
         </View>
+        {/* Favorite Button */}
+        <FavoriteButton mangaId={mangaId} />
       </View>
     </ImageBackground>
   );

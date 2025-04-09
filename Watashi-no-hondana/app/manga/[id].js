@@ -21,6 +21,7 @@ const MangaDetails = () => {
         status={parsedManga.status}
         demographic={parsedManga.demographic}
         rating={parsedManga.contentRating}
+        mangaId={parsedManga.id}
       />
       <MangaDescription description={parsedManga.description} />
       <GenreList tags={parsedManga.tags} />
