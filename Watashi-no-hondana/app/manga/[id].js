@@ -1,31 +1,30 @@
 import React from "react";
 import { ScrollView } from "react-native";
-import { useLocalSearchParams } from "expo-router";
 import { useTheme } from "tamagui";
+import { useManga } from "../../context/MangaContext";
 import MangaHeader from "../../components/manga/MangaHeader";
 import MangaDescription from "../../components/manga/MangaDescription";
 import GenreList from "../../components/manga/GenreList";
 import ChapterList from "../../components/manga/ChapterList";
 
 const MangaDetails = () => {
-  const { manga, coverUrl } = useLocalSearchParams();
-  const parsedManga = JSON.parse(manga);
+  const { currentManga, coverUrl: contextCoverUrl } = useManga();
   const theme = useTheme();
 
   return (
     <ScrollView style={{ backgroundColor: theme.background.val }}>
       <MangaHeader
-        title={parsedManga.title}
-        coverUrl={coverUrl}
-        year={parsedManga.year}
-        status={parsedManga.status}
-        demographic={parsedManga.demographic}
-        rating={parsedManga.contentRating}
-        mangaId={parsedManga.id}
+        title={currentManga?.title || "Manga"}
+        coverUrl={contextCoverUrl}
+        year={currentManga?.year}
+        status={currentManga?.status}
+        demographic={currentManga?.demographic}
+        rating={currentManga?.contentRating}
+        mangaId={currentManga?.id}
       />
-      <MangaDescription description={parsedManga.description} />
-      <GenreList tags={parsedManga.tags} />
-      <ChapterList mangaId={parsedManga.id} />
+      <MangaDescription description={currentManga?.description} />
+      <GenreList tags={currentManga?.tags} />
+      <ChapterList mangaId={currentManga?.id} />
     </ScrollView>
   );
 };

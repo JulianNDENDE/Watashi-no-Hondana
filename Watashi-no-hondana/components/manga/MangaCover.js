@@ -1,35 +1,43 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TouchableOpacity } from "react-native";
 import { getCoverFilename } from "../../api/manga/mangaApi";
 import { View, Text, Image, useTheme } from "tamagui";
 import { useRouter } from "expo-router";
 import { normalizeManga } from "../../utils/normalizeManga";
+import { useManga } from "../../context/MangaContext";
 
 const MangaCover = ({ manga }) => {
-  const [coverUrl, setCoverUrl] = useState(null);
   const theme = useTheme();
   const router = useRouter();
+  const { setCurrentManga, setCoverUrl } = useManga();
+  const [localCoverUrl, setLocalCoverUrl] = useState(null);
 
   const normalizedManga = normalizeManga(manga);
   if (!normalizedManga) return null;
 
   useEffect(() => {
-    const fetchCoverFilename = async () => {
-      const filename = await getCoverFilename(normalizedManga.id);
-      if (filename) {
-        setCoverUrl(`https://uploads.mangadex.org/covers/${normalizedManga.id}/${filename}.256.jpg`);
-      } else {
-        setCoverUrl("https://via.placeholder.com/120x180?text=No+Cover");
+    const fetchCover = async () => {
+      try {
+        const filename = await getCoverFilename(normalizedManga.id);
+        if (filename) {
+          setLocalCoverUrl(`https://uploads.mangadex.org/covers/${normalizedManga.id}/${filename}.256.jpg`);
+        } else {
+          setLocalCoverUrl("https://via.placeholder.com/120x180?text=No+Cover");
+        }
+      } catch (error) {
+        console.error("Error fetching cover filename:", error);
+        setLocalCoverUrl("https://via.placeholder.com/120x180?text=No+Cover");
       }
     };
 
-    fetchCoverFilename();
+    fetchCover();
   }, [normalizedManga.id]);
 
   const handlePress = () => {
+    setCurrentManga(normalizedManga);
+    setCoverUrl(localCoverUrl);
     router.push({
       pathname: `/manga/${normalizedManga.id}`,
-      params: { manga: JSON.stringify(normalizedManga), coverUrl },
     });
   };
 
@@ -49,7 +57,7 @@ const MangaCover = ({ manga }) => {
       >
         {/* Cover Image */}
         <Image
-          source={{ uri: coverUrl }}
+          source={{ uri: localCoverUrl }}
           width={100}
           height={150}
           borderRadius={8}

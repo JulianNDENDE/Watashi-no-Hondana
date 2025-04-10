@@ -30,31 +30,39 @@ const ChapterList = ({ mangaId }) => {
         Chapters ({totalChapters})
       </Text>
       {chapters.length > 0 ? (
-        chapters.map((chapter) => (
-          <TouchableOpacity
-            key={chapter.id}
-            onPress={() =>
-              router.push({
-                pathname: `/manga/chapter/${chapter.id}`,
-                params: { chapterTitle: chapter.title, chapterNumber: chapter.number },
-              })
-            }
-          >
-            <View
-              backgroundColor={theme.backgroundLight}
-              padding={10}
-              borderRadius={8}
-              marginVertical={5}
+        chapters.map((chapter) => {
+          const chapterListJson = JSON.stringify(chapters);
+          return (
+            <TouchableOpacity
+              key={chapter.id}
+              onPress={() =>
+                router.push({
+                  pathname: `/manga/chapter/${chapter.id}`,
+                  params: {
+                    chapterTitle: chapter.title,
+                    chapterNumber: chapter.number,
+                    mangaId,
+                    chapterListJson,
+                  },
+                })
+              }
             >
-              <Text fontSize={16} fontWeight="bold" color={theme.color}>
-                {`${chapter.title} (N°${chapter.number})`}
-              </Text>
-              <Text fontSize={12} color={theme.colorMuted}>
-                {`${chapter.pages} page(s) • ${chapter.publishedAt}`}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        ))
+              <View
+                backgroundColor={theme.backgroundLight}
+                padding={10}
+                borderRadius={8}
+                marginVertical={5}
+              >
+                <Text fontSize={16} fontWeight="bold" color={theme.color}>
+                  {`${chapter.title} (N°${chapter.number})`}
+                </Text>
+                <Text fontSize={12} color={theme.colorMuted}>
+                  {`${chapter.pages} page(s) • ${chapter.publishedAt}`}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })
       ) : (
         <Text fontSize={14} color={theme.colorMuted}>
           No chapters available.

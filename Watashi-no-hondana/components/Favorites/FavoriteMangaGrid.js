@@ -1,14 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { ScrollView, TouchableOpacity, Image, Text, StyleSheet } from "react-native";
-import useUserStore from "../../store/userStore";
-import shallow from 'zustand/shallow';
+import React, { useState, useEffect, useMemo } from "react";
+import { ScrollView, TouchableOpacity, Image, Text, StyleSheet, View as RNView } from "react-native";
+import { useUser } from "../../context/UserContext";
+import { useManga } from "../../context/MangaContext";
 import { getMangaById, getCoverFilename } from "../../api/manga/mangaApi";
 import { normalizeManga } from "../../utils/normalizeManga";
 import { useRouter } from "expo-router";
-import { View, useTheme } from "tamagui";
+import { useTheme } from "tamagui";
 
 const FavoriteMangaGrid = () => {
-  const favorites = useUserStore((state) => state.user?.favorites ?? [], shallow);
+  const { user } = useUser();
+  const favorites = user?.favorites ?? [];
+  const favoritesCount = favorites.length;
+  const favoritesKey = useMemo(() => favorites.join(","), [favorites]);
+  
+  const { setCurrentManga, setCoverUrl } = useManga();
+
   const [mangaList, setMangaList] = useState([]);
   const theme = useTheme();
   const router = useRouter();
@@ -38,27 +44,35 @@ const FavoriteMangaGrid = () => {
       }
     };
 
-    if (favorites.length) {
+    if (favoritesCount) {
       fetchFavoriteMangas();
     } else {
       setMangaList([]);
     }
-  }, [favorites]);
+  }, [favoritesCount, favoritesKey]);
 
   const handlePress = (manga) => {
+    setCurrentManga(manga);
+    setCoverUrl(manga.coverUrl);
     router.push({
       pathname: `/manga/${manga.id}`,
-      params: { manga: JSON.stringify(manga), coverUrl: manga.coverUrl },
     });
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={{ width: "100%", marginBottom: 10 }}>
-        <Text style={{ fontSize: 24, fontWeight: "bold", color: theme.color.val, textAlign: "center" }}>
+      <RNView style={{ width: "100%", marginBottom: 10 }}>
+        <Text
+          style={{
+            fontSize: 24,
+            fontWeight: "bold",
+            color: theme.color.val,
+            textAlign: "center",
+          }}
+        >
           Favorites Mangas ({mangaList.length})
         </Text>
-      </View>
+      </RNView>
       {mangaList.length > 0 ? (
         mangaList.map((manga) => (
           <TouchableOpacity
@@ -77,11 +91,17 @@ const FavoriteMangaGrid = () => {
           </TouchableOpacity>
         ))
       ) : (
-        <View style={{ width: "100%", marginTop: 20 }}>
-          <Text style={{ fontSize: 16, color: theme.colorMuted.val, textAlign: "center" }}>
+        <RNView style={{ width: "100%", marginTop: 20 }}>
+          <Text
+            style={{
+              fontSize: 16,
+              color: theme.colorMuted.val,
+              textAlign: "center",
+            }}
+          >
             No favorite mangas found.
           </Text>
-        </View>
+        </RNView>
       )}
     </ScrollView>
   );

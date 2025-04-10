@@ -23,7 +23,7 @@ export const ReadingModeMenu = ({ visible, currentMode, onSelectMode, onClose })
       right={0}
       padding={20}
       backgroundColor={theme.backgroundStrong.val}
-      zIndex={1000}  // Ensure it sits above everything
+      zIndex={1000}
     >
       <Text fontSize={16} fontWeight="bold" color={theme.color.val} marginBottom={10}>
         Reading mode

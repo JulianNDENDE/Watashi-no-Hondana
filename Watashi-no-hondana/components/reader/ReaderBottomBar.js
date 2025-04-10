@@ -4,10 +4,9 @@ import { View, useTheme } from 'tamagui'
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 
 export const ReaderBottomBar = ({
-  isRotationEnabled,
-  onToggleRotation,
   onShowReadingModeMenu,
-  onShowBrightnessMenu,
+  onNextChapter,
+  onPrevChapter,
 }) => {
   const theme = useTheme()
 
@@ -21,28 +20,26 @@ export const ReaderBottomBar = ({
       justifyContent="space-around"
       backgroundColor={`${theme.backgroundStrong.val}90`}
       padding={20}
+      borderTopWidth={1}
+      borderTopColor={theme.border.val}
     >
+      {/* Previous Chapter Arrow */}
+      <TouchableOpacity onPress={onPrevChapter}>
+        <Ionicons name="arrow-back-circle" size={28} color={theme.color.val} />
+      </TouchableOpacity>
+
       {/* Reading Mode Icon */}
       <TouchableOpacity onPress={onShowReadingModeMenu}>
         <MaterialCommunityIcons
           name="book-open-page-variant"
-          size={24}
+          size={28}
           color={theme.color.val}
         />
       </TouchableOpacity>
 
-      {/* Rotation Icon */}
-      <TouchableOpacity onPress={onToggleRotation}>
-        <MaterialCommunityIcons
-          name={isRotationEnabled ? 'rotate-3d' : 'rotate-3d-variant'}
-          size={24}
-          color={theme.color.val}
-        />
-      </TouchableOpacity>
-
-      {/* Brightness Icon */}
-      <TouchableOpacity onPress={onShowBrightnessMenu}>
-        <Ionicons name="sunny" size={24} color={theme.color.val} />
+      {/* Next Chapter Arrow */}
+      <TouchableOpacity onPress={onNextChapter}>
+        <Ionicons name="arrow-forward-circle" size={28} color={theme.color.val} />
       </TouchableOpacity>
     </View>
   )

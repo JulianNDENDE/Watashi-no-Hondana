@@ -1,11 +1,10 @@
 import { auth } from '../../firebaseConfig';
 import { signOut } from 'firebase/auth';
-import useUserStore from '../../store/userStore';
 
-export const logoutUser = async () => {
+export const logoutUser = async (logoutCallback) => {
   try {
     await signOut(auth);
-    useUserStore.getState().logout();
+    logoutCallback();
     return { success: true };
   } catch (error) {
     console.error("Logout error:", error.message);

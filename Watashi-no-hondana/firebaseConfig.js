@@ -3,7 +3,6 @@ import { getFirestore } from "firebase/firestore";
 import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCYBOOag_oqXXD8ErGSfRTWia4exOUNrpc",
@@ -15,7 +14,6 @@ const firebaseConfig = {
   measurementId: "G-NC9D2S8YH1"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = initializeAuth(app, {

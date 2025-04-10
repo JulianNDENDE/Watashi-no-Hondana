@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { TouchableOpacity } from "react-native";
 import { Text, useTheme } from "tamagui";
-import useUserStore from "../../store/userStore";
+import { useUser } from "../../context/UserContext";
 import { getUserFromDatabase, addMangaToFavorites, removeMangaFromFavorites } from "../../api/users";
 
 const FavoriteButton = ({ mangaId }) => {
   const theme = useTheme();
-  const { user, setUser } = useUserStore();
+  const { user, setUser } = useUser();
   const uid = user?.uid;
   const [isFavorite, setIsFavorite] = useState(false);
 

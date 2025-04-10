@@ -1,95 +1,127 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { ScrollView, Image, ActivityIndicator, Dimensions, View as RNView } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { ScrollView, Image, ActivityIndicator, Dimensions, View as RNView, Alert } from 'react-native'
 import { View, useTheme } from 'tamagui'
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 
 import { ReaderHeader } from '../../../components/reader/ReaderHeader'
-import { ReaderPageSlider } from '../../../components/reader/ReaderPageSlider'
 import { ReaderBottomBar } from '../../../components/reader/ReaderBottomBar'
 import { ReadingModeMenu } from '../../../components/reader/ReadingModeMenu'
-import { BrightnessMenu } from '../../../components/reader/BrightnessMenu'
-
 import { getChapterImages } from '../../../api/manga/mangaApi'
+import { getNavigationInfoFromChapterList } from '../../../utils/getNavigationInfoFromChapterList';
 
-const { width: deviceWidth } = Dimensions.get('window')
-const imageHeight = deviceWidth * 1.46
+const { width: deviceWidth } = Dimensions.get('window');
+const imageHeight = deviceWidth * 1.45;
 
 const MangaReader = () => {
-  const theme = useTheme()
-  const router = useRouter()
-  const { chapterId, chapterTitle, chapterNumber } = useLocalSearchParams()
+  const theme = useTheme();
+  const router = useRouter();
 
-  // State for full-screen mode (hides overlays)
-  const [fullScreenMode, setFullScreenMode] = useState(false)
+  const { chapterId, chapterTitle, chapterNumber, mangaId, chapterListJson } = useLocalSearchParams();
 
-  // Other reader settings
-  const [readingMode, setReadingMode] = useState('Paged (left to right)')
-  const [isRotationEnabled, setIsRotationEnabled] = useState(true)
-  const [brightness, setBrightness] = useState(50)
+  let chapters = [];
+  if (chapterListJson) {
+    try {
+      chapters = JSON.parse(chapterListJson);
+    } catch (error) {
+      console.error("Error parsing chapterListJson:", error);
+    }
+  }
+  const navInfo = getNavigationInfoFromChapterList(chapters, chapterId);
 
-  // Menu visibility states
-  const [isReadingModeMenuVisible, setIsReadingModeMenuVisible] = useState(false)
-  const [isBrightnessMenuVisible, setIsBrightnessMenuVisible] = useState(false)
+  const [fullScreenMode, setFullScreenMode] = useState(false);
 
-  // Chapter images and loading state
-  const [chapterImages, setChapterImages] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [readingMode, setReadingMode] = useState('Paged (left to right)');
+  const [isRotationEnabled, setIsRotationEnabled] = useState(true);
 
-  // Toggling full-screen mode by tapping content
-  const toggleFullScreenMode = () => setFullScreenMode((prev) => !prev)
+  const [isReadingModeMenuVisible, setIsReadingModeMenuVisible] = useState(false);
+  const [isBrightnessMenuVisible, setIsBrightnessMenuVisible] = useState(false);
 
-  // Fetch chapter images when chapterId changes
+  const [chapterImages, setChapterImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const toggleFullScreenMode = () => setFullScreenMode(prev => !prev);
+
+  const goBackToDetails = () => {
+    router.replace(`/manga/${mangaId}`);
+  };
+
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const images = await getChapterImages(chapterId)
-        setChapterImages(images)
+        const images = await getChapterImages(chapterId);
+        setChapterImages(images);
       } catch (error) {
-        console.error(error)
+        console.error('Error fetching chapter images:', error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
+    };
+    fetchImages();
+  }, [chapterId]);
+
+  const loadNextChapter = () => {
+    if (navInfo.nextChapter && navInfo.nextChapter.id) {
+      router.push({
+        pathname: `/manga/chapter/${navInfo.nextChapter.id}`,
+        params: {
+          chapterTitle: navInfo.nextChapter.title,
+          chapterNumber: navInfo.nextChapter.number,
+          mangaId,
+          chapterListJson,
+        },
+      });
+    } else {
+      Alert.alert("No Next Chapter", "This is the last chapter available.");
     }
-    fetchImages()
-  }, [chapterId])
+  };
+
+  const loadPreviousChapter = () => {
+    if (navInfo.prevChapter && navInfo.prevChapter.id) {
+      router.push({
+        pathname: `/manga/chapter/${navInfo.prevChapter.id}`,
+        params: {
+          chapterTitle: navInfo.prevChapter.title,
+          chapterNumber: navInfo.prevChapter.number,
+          mangaId,
+          chapterListJson,
+        },
+      });
+    } else {
+      Alert.alert("No Previous Chapter", "This is the first chapter available.");
+    }
+  };
 
   return (
     <View flex={1} backgroundColor={theme.background.val}>
-      {/* Hide system status bar in full screen */}
       <StatusBar hidden={fullScreenMode} />
 
-      {/* Block touches when a menu is open */}
+      {/* Overlay to block touches when menus are open */}
       {(isReadingModeMenuVisible || isBrightnessMenuVisible) && (
         <RNView
           style={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
+            top: 0, left: 0, right: 0, bottom: 0,
             backgroundColor: 'rgba(0,0,0,0.5)',
             zIndex: 500,
           }}
         />
       )}
 
-      {/* Header */}
+      {/* Header (absolutely positioned) */}
       {!fullScreenMode && !isReadingModeMenuVisible && !isBrightnessMenuVisible && (
         <ReaderHeader
-          onBack={() => router.back()}
+          onBack={goBackToDetails}
           chapterTitle={chapterTitle}
           chapterNumber={chapterNumber}
         />
       )}
 
-      {/* Manga Pages using FlatList */}
+      {/* Manga Pages */}
       <ScrollView
-        onTouchEnd={toggleFullScreenMode}
         removeClippedSubviews={true}
-        contentContainerStyle={{
-          padding: 0,
-        }}
+        contentContainerStyle={{ padding: 0 }}
+        onTouchEnd={toggleFullScreenMode}
       >
         {isLoading ? (
           <ActivityIndicator size="large" color={theme.primary.val} />
@@ -100,7 +132,7 @@ const MangaReader = () => {
               source={{ uri }}
               style={{
                 width: deviceWidth,
-                height: deviceWidth * 1.445,
+                height: imageHeight,
                 resizeMode: 'contain',
               }}
             />
@@ -108,7 +140,7 @@ const MangaReader = () => {
         )}
       </ScrollView>
 
-      {/* Bottom Bar (only when no menu is open) */}
+      {/* Bottom Bar with arrow buttons for chapter navigation */}
       {!fullScreenMode && !isReadingModeMenuVisible && !isBrightnessMenuVisible && (
         <ReaderBottomBar
           isRotationEnabled={isRotationEnabled}
@@ -116,6 +148,8 @@ const MangaReader = () => {
           onShowReadingModeMenu={() => setIsReadingModeMenuVisible(true)}
           onShowBrightnessMenu={() => setIsBrightnessMenuVisible(true)}
           onToggleFullScreen={toggleFullScreenMode}
+          onNextChapter={loadNextChapter}
+          onPrevChapter={loadPreviousChapter}
         />
       )}
 
@@ -126,16 +160,8 @@ const MangaReader = () => {
         onSelectMode={(mode) => setReadingMode(mode)}
         onClose={() => setIsReadingModeMenuVisible(false)}
       />
-
-      {/* Brightness Menu */}
-      <BrightnessMenu
-        visible={isBrightnessMenuVisible}
-        brightness={brightness}
-        onChangeBrightness={(val) => setBrightness(val)}
-        onClose={() => setIsBrightnessMenuVisible(false)}
-      />
     </View>
-  )
-}
+  );
+};
 
-export default MangaReader
+export default MangaReader;
