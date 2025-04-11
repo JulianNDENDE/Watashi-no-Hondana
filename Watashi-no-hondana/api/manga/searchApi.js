@@ -1,16 +1,19 @@
-import { getMangasBySearch } from "./mangaApi";
+import { getMangasBySearch as getMangasBySearchMangaDex } from "./sources/mangaDexApi";
+import { getMangasBySearch as getMangasBySearchJikan } from "./sources/jikanApi";
 
 const searchManga = async (query) => {
   try {
-    // First, search in MangaDex
-    const mangaDexResults = await getMangasBySearch(query);
+    const [mangaDexResults, jikanResults] = await Promise.all([
+      getMangasBySearchMangaDex(query),
+      getMangasBySearchJikan(query)
+    ]);
 
-    // You can later add more APIs here, for example:
-    // const aniListResults = await aniListApi.getMangasBySearch(query);
+    const mangaDexResultsWithSource = { ...mangaDexResults, source: "mangadex" };
+    const jikanResultsWithSource = { ...jikanResults, source: "jikan" };
 
     return {
-      mangaDex: mangaDexResults,
-      // aniList: aniListResults,
+      mangaDex: mangaDexResultsWithSource,
+      jikan: jikanResultsWithSource,
     };
   } catch (error) {
     console.error("Error searching for manga:", error);

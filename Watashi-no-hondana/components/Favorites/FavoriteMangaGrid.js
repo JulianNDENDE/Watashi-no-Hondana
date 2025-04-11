@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { ScrollView, TouchableOpacity, Image, Text, StyleSheet, View as RNView } from "react-native";
 import { useUser } from "../../context/UserContext";
 import { useManga } from "../../context/MangaContext";
-import { getMangaById, getCoverFilename } from "../../api/manga/mangaApi";
+import { getMangaById, getCoverFilename } from "../../api/manga/sources/mangaDexApi";
 import { normalizeManga } from "../../utils/normalizeManga";
 import { useRouter } from "expo-router";
 import { useTheme } from "tamagui";

@@ -4,7 +4,7 @@ import { View, Text, useTheme } from "tamagui";
 import { useRouter } from "expo-router";
 import { getChapters } from "../../api/manga/mangaApi";
 
-const ChapterList = ({ mangaId }) => {
+const ChapterList = ({ mangaId, source }) => {
   const [chapters, setChapters] = useState([]);
   const [totalChapters, setTotalChapters] = useState(0);
   const theme = useTheme();
@@ -13,7 +13,7 @@ const ChapterList = ({ mangaId }) => {
   useEffect(() => {
     const fetchChapters = async () => {
       try {
-        const { chapters: chapterData, totalChapters } = await getChapters(mangaId);
+        const { chapters: chapterData, totalChapters } = await getChapters(mangaId, source);
         setChapters(chapterData);
         setTotalChapters(totalChapters);
       } catch (error) {

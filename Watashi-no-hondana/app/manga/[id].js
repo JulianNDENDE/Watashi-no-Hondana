@@ -14,17 +14,19 @@ const MangaDetails = () => {
   return (
     <ScrollView style={{ backgroundColor: theme.background.val }}>
       <MangaHeader
-        title={currentManga?.title || "Manga"}
+        title={currentManga?.title}
         coverUrl={contextCoverUrl}
         year={currentManga?.year}
         status={currentManga?.status}
         demographic={currentManga?.demographic}
         rating={currentManga?.contentRating}
         mangaId={currentManga?.id}
+        authors={currentManga?.authors}
+        source={currentManga?.source}
       />
       <MangaDescription description={currentManga?.description} />
       <GenreList tags={currentManga?.tags} />
-      <ChapterList mangaId={currentManga?.id} />
+      <ChapterList mangaId={currentManga?.id} source={currentManga?.source} />
     </ScrollView>
   );
 };

@@ -1,91 +1,80 @@
-import axios from 'axios';
+import {
+  getMangasBySearch as getMangasBySearchMangaDex,
+  getMangaById as getMangaByIdMangaDex,
+  getCoverFilename as getCoverFilenameMangaDex,
+  getChapters as getChaptersMangaDex,
+  getChapterImages as getChapterImagesMangaDex
+} from "./sources/mangaDexApi";
 
-const MANGADEX_BASE_URL = 'https://api.mangadex.org';
+import {
+  getMangasBySearch as getMangasBySearchJikan,
+  getMangaById as getMangaByIdJikan,
+  getCoverFilename as getCoverFilenameJikan,
+  getChapters as getChaptersJikan,
+  getChapterImages as getChapterImagesJikan
+} from "./sources/jikanApi";
 
-
-export const getMangasBySearch = async (query) => {
+export const getMangasBySearch = async (query, options = {}) => {
+  const source = options.source || "mangadex";
   try {
-    const response = await axios.get(`${MANGADEX_BASE_URL}/manga`, {
-      params: {
-        title: query,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching data from MangaDex:", error);
-    throw new Error("Failed to fetch manga data");
-  }
-};
-
-export const getMangaById = async (mangaId) => {
-  try {
-    const response = await axios.get(`${MANGADEX_BASE_URL}/manga/${mangaId}?includes[]=cover_art`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching manga by id:", error);
-    throw new Error("Failed to fetch manga by id");
-  }
-};
-
-export const getCoverFilename = async (mangaId) => {
-  try {
-    const response = await axios.get(`${MANGADEX_BASE_URL}/manga/${mangaId}?includes[]=cover_art`);
-    const coverArt = response.data.data.relationships.find(
-      (rel) => rel.type === 'cover_art'
-    );
-
-    if (coverArt) {
-      return coverArt.attributes.fileName || null;
+    if (source === "mangadex") {
+      return await getMangasBySearchMangaDex(query);
+    } else if (source === "jikan") {
+      return await getMangasBySearchJikan(query);
+    } else if (source === "both") {
+      const [mangaDexResults, jikanResults] = await Promise.all([
+        getMangasBySearchMangaDex(query),
+        getMangasBySearchJikan(query),
+      ]);
+      return {
+        mangaDex: { ...mangaDexResults, source: "mangadex" },
+        jikan: { ...jikanResults, source: "jikan" }
+      };
+    } else {
+      throw new Error(`Unknown source: ${source}`);
     }
-
-    return null;
   } catch (error) {
-    console.error('Error fetching cover filename:', error);
-    return null;
+    console.error("Error searching for manga:", error);
+    throw error;
   }
 };
 
-export const getChapters = async (mangaId) => {
-  try {
-    const response = await axios.get(
-      `${MANGADEX_BASE_URL}/manga/${mangaId}/feed?translatedLanguage[]=en&order[chapter]=desc`
-    );
-
-    return {
-      chapters: response.data.data.map((chapter) => {
-        const scanlationGroup = chapter.relationships.find(
-          (rel) => rel.type === "scanlation_group"
-        )?.attributes?.name || "Unknown Group";
-
-        return {
-          id: chapter.id,
-          number: chapter.attributes.chapter || "?",
-          title: chapter.attributes.title || `Chapter ${chapter.attributes.chapter}`,
-          publishedAt: new Date(chapter.attributes.publishAt).toLocaleDateString(),
-          pages: chapter.attributes.pages,
-          scanlationGroup,
-        };
-      }),
-      totalChapters: response.data.total,
-    };
-  } catch (error) {
-    console.error("Error fetching chapters:", error);
-    return { chapters: [], totalChapters: 0 };
+export const getMangaById = async (mangaId, source = "mangadex") => {
+  if (source === "mangadex") {
+    return await getMangaByIdMangaDex(mangaId);
+  } else if (source === "jikan") {
+    return await getMangaByIdJikan(mangaId);
+  } else {
+    throw new Error(`getMangaById: Unknown source: ${source}`);
   }
 };
 
-export const getChapterImages = async (chapterId) => {
-  try {
-    const response = await axios.get(`${MANGADEX_BASE_URL}/at-home/server/${chapterId}`);
-    const { baseUrl, chapter } = response.data;
-    const imageFilenames = chapter.data;
-    // Construct full URLs: baseUrl + '/data/' + chapter.hash + '/' + filename
-    const imageUrls = imageFilenames.map(
-      filename => `${baseUrl}/data/${chapter.hash}/${filename}`
-    );
-    return imageUrls;
-  } catch (error) {
-    console.error("Error fetching chapter images:", error);
-    throw new Error("Failed to fetch chapter images");
+export const getCoverFilename = async (mangaId, source = "mangadex") => {
+  if (source === "mangadex") {
+    return await getCoverFilenameMangaDex(mangaId);
+  } else if (source === "jikan") {
+    return await getCoverFilenameJikan(mangaId);
+  } else {
+    throw new Error(`getCoverFilename: Unknown source: ${source}`);
+  }
+};
+
+export const getChapters = async (mangaId, source = "mangadex") => {
+  if (source === "mangadex") {
+    return await getChaptersMangaDex(mangaId);
+  } else if (source === "jikan") {
+    return await getChaptersJikan(mangaId);
+  } else {
+    throw new Error(`getChapters: Unknown source: ${source}`);
+  }
+};
+
+export const getChapterImages = async (chapterId, source = "mangadex") => {
+  if (source === "mangadex") {
+    return await getChapterImagesMangaDex(chapterId);
+  } else if (source === "jikan") {
+    return await getChapterImagesJikan(chapterId); // This will throw an error.
+  } else {
+    throw new Error(`getChapterImages: Unknown source: ${source}`);
   }
 };

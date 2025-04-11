@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, ScrollView, useTheme, Text } from 'tamagui';
+import { ScrollView } from 'react-native';
+import { View, Text, useTheme } from 'tamagui';
 import searchManga from '../../api/manga/searchApi';
 import MangaCover from '../../components/manga/MangaCover';
 import CustomInput from '../../components/inputs/CustomInput';
@@ -8,7 +9,7 @@ import CustomButton from '../../components/buttons/CustomButton';
 const Search = () => {
   const theme = useTheme();
   const [query, setQuery] = useState('');
-  const [mangas, setMangas] = useState([]);
+  const [mangas, setMangas] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -19,7 +20,7 @@ const Search = () => {
     setError('');
     try {
       const results = await searchManga(query);
-      setMangas(results.mangaDex.data);
+      setMangas(results);
     } catch (error) {
       setError('Failed to fetch manga data');
       console.error(error);
@@ -35,19 +36,61 @@ const Search = () => {
         placeholder="Enter manga name"
         type="search"
       />
-      <CustomButton onPress={handleSearch} title={loading ? 'Searching...' : 'Search'} disabled={loading} />
+      <CustomButton
+        onPress={handleSearch}
+        title={loading ? 'Searching...' : 'Search'}
+        disabled={loading}
+      />
 
       {error && <Text color="red">{error}</Text>}
 
       <ScrollView marginTop={16} showsVerticalScrollIndicator={false}>
-        {mangas.length === 0 && query && !loading && (
-          <Text color={theme.colorMuted.val} textAlign="center" marginTop={20}>
-            No results found. Try searching for something else.
-          </Text>
+        {mangas && mangas.mangaDex && mangas.mangaDex.data?.length > 0 && (
+          <>
+            <Text
+              fontSize={20}
+              fontWeight="bold"
+              marginBottom={8}
+              color={theme.color.val}
+            >
+              MangaDex API results ({mangas.mangaDex.total})
+            </Text>
+            {mangas.mangaDex.data.map((manga) => (
+              <MangaCover key={manga.id} manga={manga} source="mangadex" />
+            ))}
+          </>
         )}
-        {mangas.map((manga) => (
-          <MangaCover key={manga.id} manga={manga} />
-        ))}
+
+        {mangas && mangas.jikan && mangas.jikan.data?.length > 0 && (
+          <>
+            <Text
+              fontSize={20}
+              fontWeight="bold"
+              marginBottom={8}
+              color={theme.color.val}
+            >
+              Jikan API results ({mangas.jikan.data.length})
+            </Text>
+            {mangas.jikan.data.map((manga) => (
+              <MangaCover key={manga.mal_id || manga.id} manga={manga} source="jikan" />
+            ))}
+          </>
+        )}
+
+        {mangas &&
+          (!mangas.mangaDex || mangas.mangaDex.data?.length === 0) &&
+          (!mangas.jikan || mangas.jikan.data?.length === 0) &&
+          query &&
+          !loading && (
+            <Text
+              color={theme.colorMuted.val}
+              textAlign="center"
+              marginTop={20}
+              fontSize={16}
+            >
+              No results found. Try searching for something else.
+            </Text>
+          )}
       </ScrollView>
     </View>
   );

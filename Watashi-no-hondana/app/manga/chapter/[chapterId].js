@@ -7,7 +7,7 @@ import { StatusBar } from 'expo-status-bar'
 import { ReaderHeader } from '../../../components/reader/ReaderHeader'
 import { ReaderBottomBar } from '../../../components/reader/ReaderBottomBar'
 import { ReadingModeMenu } from '../../../components/reader/ReadingModeMenu'
-import { getChapterImages } from '../../../api/manga/mangaApi'
+import { getChapterImages } from '../../../api/manga/sources/mangaDexApi'
 import { getNavigationInfoFromChapterList } from '../../../utils/getNavigationInfoFromChapterList';
 
 const { width: deviceWidth } = Dimensions.get('window');

@@ -6,21 +6,23 @@ import { useRouter } from "expo-router";
 import { normalizeManga } from "../../utils/normalizeManga";
 import { useManga } from "../../context/MangaContext";
 
-const MangaCover = ({ manga }) => {
+const MangaCover = ({ manga, source }) => {
   const theme = useTheme();
   const router = useRouter();
   const { setCurrentManga, setCoverUrl } = useManga();
   const [localCoverUrl, setLocalCoverUrl] = useState(null);
 
-  const normalizedManga = normalizeManga(manga);
+  const normalizedManga = normalizeManga(manga, source);
   if (!normalizedManga) return null;
 
   useEffect(() => {
     const fetchCover = async () => {
       try {
-        const filename = await getCoverFilename(normalizedManga.id);
-        if (filename) {
+        const filename = await getCoverFilename(normalizedManga.id, source);
+        if (filename && source === "mangadex") {
           setLocalCoverUrl(`https://uploads.mangadex.org/covers/${normalizedManga.id}/${filename}.256.jpg`);
+        } else if (filename && source === "jikan") {
+          setLocalCoverUrl(filename);
         } else {
           setLocalCoverUrl("https://via.placeholder.com/120x180?text=No+Cover");
         }

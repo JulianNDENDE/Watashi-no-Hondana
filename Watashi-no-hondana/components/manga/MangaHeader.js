@@ -5,17 +5,17 @@ import FavoriteButton from "../../components/buttons/FavoriteButton";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
-const MangaHeader = ({ title, coverUrl, year, status, demographic, rating, mangaId }) => {
+const MangaHeader = ({ title, coverUrl, year, status, demographic, rating, mangaId, authors, source }) => {
   const theme = useTheme();
   const router = useRouter();
 
   const goHome = () => {
-    router.push("/home");
+    router.replace("/home");
   };
 
   return (
-    <ImageBackground
-      source={{ uri: coverUrl }}
+    <ImageBackground 
+      source={{ uri: coverUrl }} 
       style={{ width: "100%", height: 250 }}
       blurRadius={10}
     >
@@ -50,6 +50,12 @@ const MangaHeader = ({ title, coverUrl, year, status, demographic, rating, manga
             </Text>
             <Text fontSize={14} color={theme.colorMuted}>
               {year || "N/A"} • {status || "Unknown"} • {demographic || "N/A"}
+            </Text>
+            <Text fontSize={14} color={theme.colorMuted} style={{ flexWrap: "wrap", maxWidth: "90%" }}>
+              Authors: {authors || "Unknown"}
+            </Text>
+            <Text fontSize={14} color={theme.colorMuted}>
+              Source: {source || "Unknown"}
             </Text>
             <Text fontSize={14} color={theme.primary}>
               Rating: {rating || "N/A"}
