@@ -69,7 +69,7 @@ const Search = () => {
               marginBottom={8}
               color={theme.color.val}
             >
-              Jikan API results ({mangas.jikan.data.length})
+              Jikan API results ({mangas.jikan.data.length}) <Text fontSize={12} color={theme.colorMuted.val}>[doesn't provide chapters content]</Text>
             </Text>
             {mangas.jikan.data.map((manga) => (
               <MangaCover key={manga.mal_id || manga.id} manga={manga} source="jikan" />

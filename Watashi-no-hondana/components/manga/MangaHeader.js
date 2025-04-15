@@ -63,7 +63,7 @@ const MangaHeader = ({ title, coverUrl, year, status, demographic, rating, manga
           </View>
         </View>
         {/* Favorite Button */}
-        <FavoriteButton mangaId={mangaId} />
+        <FavoriteButton mangaId={mangaId} source={source} />
       </View>
     </ImageBackground>
   );

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { ScrollView, TouchableOpacity, Image, Text, StyleSheet, View as RNView } from "react-native";
 import { useUser } from "../../context/UserContext";
 import { useManga } from "../../context/MangaContext";
-import { getMangaById, getCoverFilename } from "../../api/manga/sources/mangaDexApi";
+import { getMangaById, getCoverFilename } from "../../api/manga/mangaApi";
 import { normalizeManga } from "../../utils/normalizeManga";
 import { useRouter } from "expo-router";
 import { useTheme } from "tamagui";
@@ -11,10 +11,12 @@ const FavoriteMangaGrid = () => {
   const { user } = useUser();
   const favorites = user?.favorites ?? [];
   const favoritesCount = favorites.length;
-  const favoritesKey = useMemo(() => favorites.join(","), [favorites]);
-  
-  const { setCurrentManga, setCoverUrl } = useManga();
+  const favoritesKey = useMemo(
+    () => favorites.map((fav) => `${fav.mangaId}-${fav.source}`).join(","),
+    [favorites]
+  );
 
+  const { setCurrentManga, setCoverUrl } = useManga();
   const [mangaList, setMangaList] = useState([]);
   const theme = useTheme();
   const router = useRouter();
@@ -22,18 +24,21 @@ const FavoriteMangaGrid = () => {
   useEffect(() => {
     const fetchFavoriteMangas = async () => {
       try {
-        const fetches = favorites.map(async (mangaId) => {
+        const fetches = favorites.map(async (fav) => {
+          const { mangaId, source } = fav;
           try {
-            const response = await getMangaById(mangaId);
-            const normalized = normalizeManga(response.data ? response.data : response);
+            const response = await getMangaById(mangaId, source);
+            const normalized = normalizeManga(response.data ? response.data : response, source);
             if (!normalized) return null;
-            const filename = await getCoverFilename(normalized.id);
+            const filename = await getCoverFilename(normalized.id, source);
             const coverUrl = filename
-              ? `https://uploads.mangadex.org/covers/${normalized.id}/${filename}.256.jpg`
+              ? (source === 'mangadex'
+                  ? `https://uploads.mangadex.org/covers/${normalized.id}/${filename}.256.jpg`
+                  : filename)
               : "https://via.placeholder.com/120x180?text=No+Cover";
             return { ...normalized, coverUrl };
           } catch (err) {
-            console.error(`Error fetching manga with id ${mangaId}:`, err);
+            console.error(`Error fetching manga with id ${mangaId} from ${source}:`, err);
             return null;
           }
         });

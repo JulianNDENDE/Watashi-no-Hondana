@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { TouchableOpacity } from "react-native";
 import { Text, useTheme } from "tamagui";
 import { useUser } from "../../context/UserContext";
-import { getUserFromDatabase, addMangaToFavorites, removeMangaFromFavorites } from "../../api/users";
+import { getUserFromDatabase } from "../../api/users/index";
+import { addMangaToFavorites, removeMangaFromFavorites } from "../../api/users/favorites";
 
-const FavoriteButton = ({ mangaId }) => {
+const FavoriteButton = ({ mangaId, source }) => {
   const theme = useTheme();
   const { user, setUser } = useUser();
   const uid = user?.uid;
@@ -16,8 +17,11 @@ const FavoriteButton = ({ mangaId }) => {
 
       try {
         const userData = await getUserFromDatabase(uid);
-        if (userData && Array.isArray(userData.favorites) && userData.favorites.includes(mangaId)) {
-          setIsFavorite(true);
+        if (userData && Array.isArray(userData.favorites)) {
+          const favExists = userData.favorites.some(
+            (fav) => fav.mangaId === mangaId && fav.source === source
+          );
+          setIsFavorite(favExists);
         } else {
           setIsFavorite(false);
         }
@@ -27,7 +31,7 @@ const FavoriteButton = ({ mangaId }) => {
     };
 
     checkFavoriteStatus();
-  }, [uid, mangaId]);
+  }, [uid, mangaId, source]);
 
   const toggleFavorite = async () => {
     if (!uid) {
@@ -37,10 +41,10 @@ const FavoriteButton = ({ mangaId }) => {
 
     try {
       if (isFavorite) {
-        await removeMangaFromFavorites(uid, mangaId);
+        await removeMangaFromFavorites(uid, mangaId, source);
         setIsFavorite(false);
       } else {
-        await addMangaToFavorites(uid, mangaId);
+        await addMangaToFavorites(uid, mangaId, source);
         setIsFavorite(true);
       }
       const updatedUserData = await getUserFromDatabase(uid);

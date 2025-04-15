@@ -1,12 +1,5 @@
 import { db } from '../../firebaseConfig';
-import { 
-  doc, 
-  getDoc, 
-  updateDoc, 
-  arrayUnion, 
-  arrayRemove,
-  deleteDoc 
-} from 'firebase/firestore';
+import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 export const getUserFromDatabase = async (uid) => {
   try {
@@ -38,18 +31,4 @@ export const deleteAccount = async (uid) => {
     console.error("Error deleting account:", error);
     return { success: false, message: error.message };
   }
-};
-
-export const addMangaToFavorites = async (uid, mangaId) => {
-  const userRef = doc(db, 'Users', uid);
-  await updateDoc(userRef, {
-    favorites: arrayUnion(mangaId)
-  });
-};
-
-export const removeMangaFromFavorites = async (uid, mangaId) => {
-  const userRef = doc(db, 'Users', uid);
-  await updateDoc(userRef, {
-    favorites: arrayRemove(mangaId)
-  });
 };
