@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { View, Text, useTheme } from 'tamagui';
 import CustomInput from '../../components/inputs/CustomInput';
@@ -22,16 +23,16 @@ export default function RegisterScreen() {
       setError("Please fill in all fields");
       return;
     }
-  
+
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-  
+
     setLoading(true);
     const response = await registerUser(username, email, password);
     setLoading(false);
-  
+
     if (response.success) {
       router.replace('/home');
     } else {
@@ -52,9 +53,9 @@ export default function RegisterScreen() {
 
       <CustomButton title={loading ? "Registering..." : "Register"} onPress={handleRegister} disabled={loading} />
 
-      <Text color={theme.colorMuted} marginTop="$4" onPress={() => router.push('/auth/login')}>
-        Already have an account? Login
-      </Text>
+      <TouchableOpacity onPress={() => router.push('/auth/login')} style={{ marginTop: 20 }}>
+        <Text color={theme.colorMuted}>Already have an account? Login</Text>
+      </TouchableOpacity>
     </View>
   );
 }

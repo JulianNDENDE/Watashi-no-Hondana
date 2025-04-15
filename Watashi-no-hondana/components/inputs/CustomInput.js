@@ -34,6 +34,8 @@ export default function CustomInput({
         return <Mail size={20} color={theme.colorMuted.val} />;
       case 'password':
         return <Lock size={20} color={theme.colorMuted.val} />;
+      case 'passwordConfirm':
+        return <Lock size={20} color={theme.colorMuted.val} />;
       case 'phone':
         return <Phone size={20} color={theme.colorMuted.val} />;
       case 'search':
@@ -69,7 +71,7 @@ export default function CustomInput({
           backgroundColor: theme.inputBackground.val,
           borderRadius: 10,
           borderWidth: 1,
-          borderColor: !isLocalValid && value.length > 0 && !disableValidation ? 'red' : theme.border.val,
+          borderColor: !isLocalValid && value.length > 0 && !disableValidation ? theme.error.val : theme.border.val,
           paddingHorizontal: 10,
         }}
       >
@@ -108,23 +110,23 @@ export default function CustomInput({
               color: theme.inputText.val || '#9C9C9C',
               borderRadius: 10,
             }}
-            secureTextEntry={type === 'password' && !isPasswordVisible}
+            secureTextEntry={(type === 'password' || type === 'passwordConfirm') && !isPasswordVisible}
             keyboardType={type === 'email' ? 'email-address' : type === 'phone' ? 'phone-pad' : 'default'}
             {...props}
           />
         </View>
 
         {/* Password Visibility Toggle */}
-        {type === 'password' && (
+        {type === 'password' || type === 'passwordConfirm' ? (
           <TouchableOpacity style={{ padding: 10 }} onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
             {isPasswordVisible ? <Eye size={20} color={theme.colorMuted.val} /> : <EyeOff size={20} color={theme.colorMuted.val} />}
           </TouchableOpacity>
-        )}
+        ) : null}
       </View>
 
       {/* Validation Error Message */}
       {!isLocalValid && value.length > 0 && !disableValidation && (
-        <Text style={{ color: 'red', fontSize: 12, marginTop: 5 }}>{errorMessage}</Text>
+        <Text style={{ color: theme.error.val, fontSize: 12, marginTop: 5 }}>{errorMessage}</Text>
       )}
     </View>
   );

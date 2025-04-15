@@ -48706,7 +48706,8 @@ var customConfig = {
       secondary: "#4C566A",
       border: "#2E2E2E",
       inputBackground: "#303030",
-      inputText: "#C0C0C0"
+      inputText: "#C0C0C0",
+      error: "#FF4C4C"
     },
     light: {
       background: "#FFFFFF",
@@ -48718,7 +48719,8 @@ var customConfig = {
       secondary: "#737373",
       border: "#D1D5DB",
       inputBackground: "#E5E7EB",
-      inputText: "#1A1A1A"
+      inputText: "#1A1A1A",
+      error: "#FF4C4C"
     }
   }
 };

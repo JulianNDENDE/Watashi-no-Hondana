@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { View, Text, useTheme } from 'tamagui';
 import CustomInput from '../../components/inputs/CustomInput';
 import CustomButton from '../../components/buttons/CustomButton';
 import { loginUser } from '../../api/auth/login';
+import { forgotPassword } from '../../api/users/password';
 
 export default function LoginScreen() {
   const theme = useTheme();
@@ -32,6 +34,25 @@ export default function LoginScreen() {
     }
   };
 
+  const handleForgotPassword = async (email) => {
+    if (!email) {
+      return alert('Please enter your email address.');
+    }
+    try {
+      const result = await forgotPassword(email);
+      if (result.success) {
+        alert('Password reset email sent!');
+      } else {
+        alert('Failed to send password reset email: ' + result.message);
+      }
+    } catch (error) {
+      alert('Failed to send password reset email: ' + error.message);
+    } finally {
+      setEmail('');
+      setPassword('');
+    }
+  };
+
   return (
     <View flex={1} backgroundColor={theme.background} padding="$4" justifyContent="center">
       <Text color={theme.color} fontSize="$6" fontWeight="bold">Login</Text>
@@ -53,9 +74,15 @@ export default function LoginScreen() {
 
       <CustomButton title={loading ? "Logging in..." : "Login"} onPress={handleLogin} disabled={loading} />
 
-      <Text color={theme.colorMuted} marginTop="$4" onPress={() => router.push('/auth/register')}>
-        Don't have an account? Register
-      </Text>
+      <View flexDirection="row" justifyContent="space-between" marginTop="$4">
+        <TouchableOpacity onPress={() => router.push('/auth/register')}>
+          <Text color={theme.colorMuted}>Don't have an account? Register</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleForgotPassword(email)}>
+          <Text fontSize={14} color={theme.primary.val} fontWeight="600">Forgot Password?</Text>
+        </TouchableOpacity>
+      </View>
+
     </View>
   );
 }

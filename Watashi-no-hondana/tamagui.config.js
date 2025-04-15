@@ -15,6 +15,7 @@ const customConfig = {
       border: '#2E2E2E',
       inputBackground: '#303030',
       inputText: '#C0C0C0',
+      error: '#FF4C4C',
     },
     light: {
       background: '#FFFFFF',
@@ -27,6 +28,7 @@ const customConfig = {
       border: '#D1D5DB',
       inputBackground: '#E5E7EB',
       inputText: '#1A1A1A',
+      error: '#FF4C4C',
     },
   },
 };
