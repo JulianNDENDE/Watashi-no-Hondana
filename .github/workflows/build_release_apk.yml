@@ -10,6 +10,9 @@ on:
 jobs:
   build_and_release:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Watashi-no-hondana
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -21,18 +24,15 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: Watashi-no-hondana
 
       - name: Setup Expo and EAS
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
-        working-directory: Watashi-no-hondana
 
       - name: Setup EAS local builds
         run: npm install -g eas-cli-local-build-plugin
-        working-directory: Watashi-no-hondana
 
       - name: Build app
         run: |
@@ -41,7 +41,6 @@ jobs:
             --output=./app-release.apk \
             --platform=android \
             --profile=production
-        working-directory: Watashi-no-hondana
 
       - name: Create Release
         id: create_release
