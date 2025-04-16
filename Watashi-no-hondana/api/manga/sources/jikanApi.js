@@ -43,7 +43,6 @@ export const getCoverFilename = async (mangaId) => {
 export const getChapters = async (mangaId) => {
   try {
     const mangaDetails = await getMangaById(mangaId);
-    // Some manga might include a chapters field (or you may need to adjust based on actual response)
     const chapters = mangaDetails.data?.chapters || [];
     return { chapters, totalChapters: chapters.length };
   } catch (error) {
