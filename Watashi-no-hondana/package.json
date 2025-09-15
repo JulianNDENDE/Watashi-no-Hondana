@@ -29,7 +29,7 @@
     "@tamagui/static": "^1.125.26",
     "@tamagui/theme": "^1.125.26",
     "@tamagui/web": "^1.125.26",
-    "axios": "^1.8.4",
+    "axios": "^1.12.0",
     "expo": "^52.0.46",
     "expo-blur": "~14.0.3",
     "expo-constants": "~17.0.8",
